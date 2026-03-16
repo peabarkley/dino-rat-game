@@ -2,318 +2,297 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- SEO -->
-    <title>T-REX VS RAT · 霸王龙怕老鼠</title>
-    <meta name="description" content="🦖 T-Rex eats small dinos (🦕) for points, but must avoid rats (🐀). Minimalist browser game with local leaderboard.">
-    <meta name="keywords" content="T-REX game, dino game, rat game, browser game, 霸王龙, 老鼠, 小游戏">
-    <meta name="author" content="Your Name">
-    
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://dino-rat-game.vercel.app">
-    <meta property="og:title" content="T-REX VS RAT">
-    <meta property="og:description" content="🦖 eats 🦕, avoids 🐀">
-    <meta property="og:image" content="https://dino-rat-game.vercel.app/screenshot.png">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>🦖</text></svg>">
-    
-    <meta name="theme-color" content="#ffffff">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>进化霸王龙 · 咀嚼动画</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
-            width: 100%;
+        @keyframes bounce {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: -apple-system, 'Segoe UI', sans-serif;
             min-height: 100vh;
-            background-color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 8px;
+            padding: 12px;
         }
 
         .game-card {
             width: 100%;
             max-width: 500px;
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            padding: 16px;
+            background: #fff;
+            border-radius: 32px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(255,215,0,0.2);
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #000000;
+            margin-bottom: 20px;
         }
 
-        .title {
-            font-size: clamp(20px, 6vw, 24px);
-            font-weight: 600;
-            color: #000000;
+        .evolution {
+            background: #000;
+            color: #ffd700;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .score {
-            font-size: clamp(28px, 8vw, 32px);
-            font-weight: 700;
-            color: #000000;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .daily {
+            background: #ffd700;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
         }
 
         .canvas-container {
             position: relative;
             width: 100%;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 1;
             margin-bottom: 16px;
-            border: 1px solid #d0d0d0;
-            background-color: #fafafa;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 3px solid #000;
         }
 
         canvas {
             width: 100%;
             height: 100%;
             display: block;
-            background-color: #fafafa;
-            cursor: crosshair;
             touch-action: none;
         }
 
-        /* 开始覆盖层 */
+        .skills {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .skill {
+            background: #f0f0f0;
+            border: 2px solid #000;
+            border-radius: 16px;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .skill.active {
+            background: #000;
+            color: #ffd700;
+        }
+
+        .skill.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .skill-emoji {
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .pause-btn {
+            background: none;
+            border: 2px solid #000;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+
+        .combo {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ff4500;
+            animation: bounce 0.3s ease;
+        }
+
+        .reset-btn {
+            background: none;
+            border: 2px solid #000;
+            font-size: 16px;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+
+        .friend-board {
+            border: 2px solid #000;
+            border-radius: 20px;
+            padding: 12px;
+        }
+
+        .friend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .friend-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+
+        .share-btn {
+            background: #000;
+            color: #ffd700;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .friend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 40px;
+            margin-bottom: 6px;
+        }
+
         .start-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.98);
+            background: rgba(0,0,0,0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 30;
-            border: 1px solid #000;
+            border-radius: 24px;
         }
 
         .start-emoji {
-            font-size: clamp(50px, 15vw, 70px);
-            margin-bottom: 16px;
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
         }
 
         .start-title {
-            font-size: clamp(22px, 7vw, 28px);
-            font-weight: 700;
-            margin-bottom: 24px;
-            text-align: center;
+            font-size: 36px;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 40px;
         }
 
         .start-btn {
-            background: none;
-            border: 2px solid #000;
-            font-size: clamp(20px, 6vw, 24px);
-            font-weight: 600;
-            padding: 12px 40px;
-            color: #000;
+            background: #ffd700;
+            border: none;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 16px 50px;
+            border-radius: 50px;
             cursor: pointer;
-            background-color: #ffffff;
-            min-width: 180px;
-            min-height: 52px;
+            box-shadow: 0 10px 0 #b87c00;
         }
 
         .start-btn:active {
-            background-color: #000;
-            color: #fff;
+            transform: translateY(8px);
+            box-shadow: 0 2px 0 #b87c00;
         }
 
-        .start-hint {
-            margin-top: 20px;
-            color: #666;
-            font-size: clamp(12px, 4vw, 14px);
-            text-align: center;
-        }
-
-        /* 游戏结束弹窗 */
         .gameover-modal {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #ffffff;
-            border: 2px solid #000000;
-            padding: 24px;
+            background: #fff;
+            border: 4px solid #000;
+            border-radius: 40px;
+            padding: 30px;
             text-align: center;
             z-index: 20;
-            width: 80%;
-            max-width: 280px;
+            width: 85%;
         }
 
         .modal-title {
-            font-size: clamp(24px, 7vw, 28px);
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 12px;
+            font-size: 36px;
+            font-weight: 800;
         }
 
         .modal-score {
-            font-size: clamp(40px, 12vw, 48px);
-            font-weight: 700;
-            color: #000;
-            margin: 12px 0;
-            border-top: 1px solid #000;
-            border-bottom: 1px solid #000;
-            padding: 12px 0;
+            font-size: 64px;
+            font-weight: 800;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+
+        .modal-evolution {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
         }
 
         .modal-btn {
-            background: none;
-            border: 2px solid #000;
-            font-size: clamp(18px, 6vw, 22px);
-            font-weight: 600;
-            padding: 12px 24px;
-            color: #000;
-            cursor: pointer;
-            margin-top: 12px;
-            width: 100%;
-            min-height: 48px;
-        }
-
-        .modal-btn:active {
-            background-color: #000;
-            color: #fff;
-        }
-
-        /* 控制栏 */
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            gap: 8px;
-        }
-
-        .pause-btn, .reset-btn {
-            background: none;
-            border: 1px solid #222;
-            font-size: clamp(14px, 4vw, 16px);
-            font-weight: 500;
-            padding: 8px 16px;
-            color: #000;
-            cursor: pointer;
-            background-color: #ffffff;
-            min-width: 70px;
-            min-height: 40px;
-        }
-
-        .pause-btn:active, .reset-btn:active {
-            background-color: #f0f0f0;
-        }
-
-        .pause-btn.paused {
-            background-color: #000;
-            color: #fff;
-        }
-
-        .status {
-            font-size: clamp(14px, 4vw, 16px);
-            color: #666;
-            min-width: 60px;
-            text-align: center;
-        }
-
-        .reset-btn {
-            border: 1px solid #aaa;
-        }
-
-        /* 排行榜 */
-        .leaderboard {
-            margin-top: 16px;
-            border: 1px solid #000;
-            padding: 12px;
-            background-color: #fff;
-        }
-
-        .leaderboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
-        }
-
-        .leaderboard-title {
-            font-size: clamp(16px, 5vw, 18px);
-            font-weight: 600;
-        }
-
-        .clear-btn {
-            background: none;
-            border: 1px solid #999;
-            padding: 4px 12px;
-            font-size: clamp(11px, 3vw, 12px);
-            cursor: pointer;
-            color: #666;
-            min-height: 30px;
-        }
-
-        .leaderboard-list {
-            min-height: 80px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: clamp(12px, 3.5vw, 14px);
-        }
-
-        .rank-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 4px;
-            border-bottom: 1px dotted #eee;
-        }
-
-        .rank-number {
-            font-weight: 600;
-            width: 35px;
-        }
-
-        .rank-score {
-            font-weight: 600;
-            width: 50px;
-            text-align: right;
-        }
-
-        .rank-date {
-            color: #999;
-            font-size: clamp(10px, 3vw, 12px);
             flex: 1;
-            text-align: right;
+            border: 2px solid #000;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 14px 0;
+            border-radius: 40px;
+            cursor: pointer;
+            background: none;
         }
 
-        .empty-message {
-            color: #aaa;
-            text-align: center;
-            padding: 16px 0;
-        }
-
-        .footer {
-            margin-top: 16px;
-            text-align: center;
-            color: #aaa;
-            font-size: clamp(18px, 6vw, 22px);
-            border-top: 1px solid #eee;
-            padding-top: 12px;
+        .modal-btn-primary {
+            background: #000;
+            color: #ffd700;
         }
 
         .hidden {
@@ -324,47 +303,85 @@
 <body>
 <div class="game-card">
     <div class="header">
-        <div class="title">🦖 VS 🐀</div>
-        <div class="score" id="scoreDisplay">0</div>
+        <div class="evolution" id="evolutionDisplay">
+            <span id="evolutionEmoji">🦖</span>
+            <span id="evolutionLevel">Lv.1</span>
+        </div>
+        <div class="score-area">
+            <div class="score" id="scoreDisplay">0</div>
+            <div class="daily" id="dailyChallenge">🔥</div>
+        </div>
     </div>
 
     <div class="canvas-container">
         <canvas id="gameCanvas" width="500" height="500"></canvas>
         
-        <!-- 开始覆盖层 -->
         <div id="startOverlay" class="start-overlay">
-            <div class="start-emoji">🦖 🐀</div>
-            <div class="start-title">T-REX VS RAT</div>
-            <button class="start-btn" id="startBtn">START</button>
-            <div class="start-hint">👆 touch to move · ␣ pause</div>
+            <div class="start-emoji">🦖</div>
+            <div class="start-title">咀嚼进化</div>
+            <button class="start-btn" id="startBtn">开始</button>
         </div>
         
-        <!-- 游戏结束弹窗 -->
         <div id="gameoverModal" class="gameover-modal hidden">
-            <div class="modal-title">GAME OVER</div>
-            <div class="modal-score" id="finalScoreDisplay">0</div>
-            <button class="modal-btn" id="retryBtn">AGAIN</button>
+            <div class="modal-title">进化终止</div>
+            <div class="modal-score" id="finalScore">0</div>
+            <div class="modal-evolution" id="finalEvolution">🦖 Lv.1</div>
+            <div class="modal-buttons">
+                <button class="modal-btn" id="retryBtn">再来</button>
+                <button class="modal-btn modal-btn-primary" id="shareBtn">分享</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="skills" id="skillPanel">
+        <div class="skill disabled" id="skillSpeed">
+            <span class="skill-emoji">⚡</span>
+            <span>加速</span>
+        </div>
+        <div class="skill disabled" id="skillShield">
+            <span class="skill-emoji">🛡️</span>
+            <span>护盾</span>
+        </div>
+        <div class="skill disabled" id="skillSlow">
+            <span class="skill-emoji">⏱️</span>
+            <span>减速</span>
+        </div>
+        <div class="skill disabled" id="skillDouble">
+            <span class="skill-emoji">2x</span>
+            <span>双倍</span>
         </div>
     </div>
 
     <div class="controls">
-        <button class="pause-btn" id="pauseBtn" disabled>PAUSE</button>
-        <span class="status" id="statusText">⏹️</span>
-        <button class="reset-btn" id="resetBtn" disabled>↺</button>
+        <button class="pause-btn" id="pauseBtn" disabled>⏸️ 暂停</button>
+        <span class="combo" id="comboDisplay">⚡0</span>
+        <button class="reset-btn" id="resetBtn" disabled>↺ 重开</button>
     </div>
 
-    <div class="leaderboard">
-        <div class="leaderboard-header">
-            <div class="leaderboard-title">🏆 LEADERBOARD</div>
-            <button class="clear-btn" id="clearRankBtn">CLEAR</button>
+    <div class="friend-board">
+        <div class="friend-header">
+            <div class="friend-title">
+                <span>👥</span>
+                <span>好友排名</span>
+            </div>
+            <button class="share-btn" id="shareBoardBtn">邀好友</button>
         </div>
-        <div class="leaderboard-list" id="rankList">
-            <div class="empty-message">no records yet</div>
+        <div id="friendList">
+            <div class="friend-item">
+                <span>👤 你</span>
+                <span id="myScore">0</span>
+            </div>
+            <div class="friend-item">
+                <span>🤖 恐龙猎人</span>
+                <span>47</span>
+                <button class="share-btn" style="padding:2px 12px;">挑战</button>
+            </div>
+            <div class="friend-item">
+                <span>🤖 霸王龙</span>
+                <span>32</span>
+                <button class="share-btn" style="padding:2px 12px;">挑战</button>
+            </div>
         </div>
-    </div>
-
-    <div class="footer">
-        <span>🦖 🦕 🐀</span>
     </div>
 </div>
 
@@ -372,151 +389,130 @@
 (function() {
     'use strict';
 
-    // ===== 获取DOM元素 =====
     const canvas = document.getElementById('gameCanvas');
-    if (!canvas) {
-        console.error('Canvas not found!');
-        return;
-    }
-
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     const w = 500, h = 500;
 
-    // ===== 游戏状态 =====
+    // 进化阶段
+    const EVOLUTIONS = [
+        { level: 1, emoji: '🦖', speed: 6.0, size: 38 },
+        { level: 2, emoji: '🦖🔥', speed: 6.8, size: 42 },
+        { level: 3, emoji: '🦖⚡', speed: 7.5, size: 46 },
+        { level: 4, emoji: '🦖👑', speed: 8.2, size: 50 },
+        { level: 5, emoji: '🦖✨', speed: 9.0, size: 54 }
+    ];
+
+    // 动画状态
+    let isChewing = false;
+    let chewFrame = 0;
+    let animatingEat = [];
+
+    // 游戏状态
     let gameStarted = false;
     let gameActive = false;
     let paused = false;
     let score = 0;
+    let evolution = 1;
+    let combo = 0;
+    let skillPoints = 0;
+    let skills = { speed: false, shield: false, slow: false, double: false };
 
     // 玩家
     let player = {
-        x: w / 2,
-        y: h / 2,
-        r: 38
+        x: w/2, y: h/2,
+        r: EVOLUTIONS[0].size,
+        speed: EVOLUTIONS[0].speed
     };
 
-    let targetX = player.x;
-    let targetY = player.y;
-    let pointerActive = false;
-    let pointerInside = false;
-
+    let targetX = player.x, targetY = player.y;
+    let pointerActive = false, pointerInside = false;
     let animals = [];
     const ANIMAL_COUNT = 14;
 
-    // ===== DOM 元素 =====
+    // 特效
+    let effects = [];
+
+    // DOM
+    const evolutionEmoji = document.getElementById('evolutionEmoji');
+    const evolutionLevel = document.getElementById('evolutionLevel');
     const scoreSpan = document.getElementById('scoreDisplay');
-    const statusText = document.getElementById('statusText');
+    const comboDisplay = document.getElementById('comboDisplay');
     const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
     const startOverlay = document.getElementById('startOverlay');
     const startBtn = document.getElementById('startBtn');
     const modal = document.getElementById('gameoverModal');
-    const finalScoreSpan = document.getElementById('finalScoreDisplay');
+    const finalScore = document.getElementById('finalScore');
+    const finalEvolution = document.getElementById('finalEvolution');
     const retryBtn = document.getElementById('retryBtn');
-    const rankList = document.getElementById('rankList');
-    const clearRankBtn = document.getElementById('clearRankBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const shareBoardBtn = document.getElementById('shareBoardBtn');
+    const myScore = document.getElementById('myScore');
 
-    // ===== 排行榜 =====
-    function loadRanks() {
-        try {
-            const stored = localStorage.getItem('dinoRatRanks');
-            return stored ? JSON.parse(stored) : [];
-        } catch (e) {
-            return [];
-        }
+    // 技能按钮
+    const skillSpeed = document.getElementById('skillSpeed');
+    const skillShield = document.getElementById('skillShield');
+    const skillSlow = document.getElementById('skillSlow');
+    const skillDouble = document.getElementById('skillDouble');
+
+    // ===== 每日挑战 =====
+    const challenges = ['⚡连击王', '🛡️无伤', '🐀杀手', '👑进化'];
+    const todayChallenge = challenges[new Date().getDate() % challenges.length];
+    document.getElementById('dailyChallenge').textContent = `🔥 ${todayChallenge}`;
+
+    // ===== 进化 =====
+    function updateEvolution() {
+        const ev = EVOLUTIONS[Math.min(evolution-1, EVOLUTIONS.length-1)];
+        evolutionEmoji.textContent = ev.emoji;
+        evolutionLevel.textContent = `Lv.${evolution}`;
+        player.r = ev.size;
+        player.speed = ev.speed;
     }
 
-    function saveRanks(ranks) {
-        try {
-            localStorage.setItem('dinoRatRanks', JSON.stringify(ranks));
-        } catch (e) {}
-    }
-
-    function displayRanks() {
-        if (!rankList) return;
+    // ===== 技能 =====
+    function activateSkill(skill) {
+        if (skillPoints <= 0 || skills[skill]) return;
+        skillPoints--;
+        skills[skill] = true;
         
-        const ranks = loadRanks();
-        if (ranks.length === 0) {
-            rankList.innerHTML = '<div class="empty-message">no records yet</div>';
-            return;
-        }
-
-        let html = '';
-        ranks.slice(0, 10).forEach((item, index) => {
-            let medal = '';
-            if (index === 0) medal = '🥇';
-            else if (index === 1) medal = '🥈';
-            else if (index === 2) medal = '🥉';
-            
-            html += `
-                <div class="rank-item">
-                    <span class="rank-number">${medal || (index + 1)}</span>
-                    <span class="rank-score">${item.score}</span>
-                    <span class="rank-date">${item.date || ''}</span>
-                </div>
-            `;
+        const btn = { speed: skillSpeed, shield: skillShield, slow: skillSlow, double: skillDouble }[skill];
+        btn.classList.add('active');
+        btn.classList.add('disabled');
+        
+        if (skill === 'speed') player.speed *= 1.3;
+        
+        effects.push({
+            x: player.x, y: player.y - 30,
+            text: { speed:'⚡加速', shield:'🛡️护盾', slow:'⏱️减速', double:'2x双倍' }[skill],
+            life: 30,
+            color: '#ffd700'
         });
-        rankList.innerHTML = html;
     }
 
-    function addScoreToRank(newScore) {
-        if (newScore === 0) return;
-        
-        const ranks = loadRanks();
-        const now = new Date();
-        const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-        
-        ranks.push({ score: newScore, date: dateStr });
-        ranks.sort((a, b) => b.score - a.score);
-        saveRanks(ranks.slice(0, 10));
-        displayRanks();
-    }
-
-    function clearRanks() {
-        if (confirm('Clear all records?')) {
-            localStorage.removeItem('dinoRatRanks');
-            displayRanks();
-        }
-    }
-
-    displayRanks();
-    if (clearRankBtn) {
-        clearRankBtn.addEventListener('click', clearRanks);
-    }
-
-    // ===== UI更新 =====
-    function refreshScoreUI() {
-        if (scoreSpan) {
-            scoreSpan.textContent = score;
-        }
-    }
+    skillSpeed.addEventListener('click', () => activateSkill('speed'));
+    skillShield.addEventListener('click', () => activateSkill('shield'));
+    skillSlow.addEventListener('click', () => activateSkill('slow'));
+    skillDouble.addEventListener('click', () => activateSkill('double'));
 
     // ===== 生成动物 =====
     function createAnimal() {
-        let type, r;
-        if (Math.random() < 0.7) {
-            type = 'small';
-            r = 22 + Math.floor(Math.random() * 16);
-        } else {
-            type = 'rat';
-            r = 24 + Math.floor(Math.random() * 16);
-        }
-
-        let x = r + Math.random() * (w - 2 * r);
-        let y = r + Math.random() * (h - 2 * r);
-
-        let speed = (type === 'small') ? 1.2 + Math.random() * 1.3 : 1.8 + Math.random() * 1.5;
-        let angle = Math.random() * 2 * Math.PI;
+        const isRat = Math.random() < (0.1 + evolution * 0.01);
+        const r = isRat ? 18 + Math.random()*14 : 16 + Math.random()*18;
+        let speed = isRat ? 1.8 : 1.2;
+        if (skills.slow) speed *= 0.7;
+        speed += evolution * 0.1;
+        const angle = Math.random() * 2 * Math.PI;
         
         return {
-            x, y, r,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            type: type
+            x: r + Math.random() * (w - 2*r),
+            y: r + Math.random() * (h - 2*r),
+            r, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+            type: isRat ? 'rat' : 'small'
         };
     }
 
-    // ===== 初始化动物 =====
     function initAnimals() {
         animals = [];
         for (let i = 0; i < ANIMAL_COUNT; i++) {
@@ -524,163 +520,247 @@
         }
     }
 
-    // ===== 重置游戏 =====
+    // ===== UI =====
+    function refreshUI() {
+        scoreSpan.textContent = score;
+        comboDisplay.innerHTML = `⚡${combo}`;
+        myScore.textContent = score;
+    }
+
+    // ===== 重置 =====
     function resetGame() {
         gameActive = true;
         paused = false;
-        if (pauseBtn) {
-            pauseBtn.textContent = 'PAUSE';
-            pauseBtn.classList.remove('paused');
-        }
-        if (statusText) statusText.textContent = '▶️';
         score = 0;
-        player.x = w / 2;
-        player.y = h / 2;
-        player.r = 38;
-
-        targetX = player.x;
-        targetY = player.y;
-        pointerActive = false;
-        pointerInside = false;
-
+        evolution = 1;
+        combo = 0;
+        skillPoints = 0;
+        skills = { speed: false, shield: false, slow: false, double: false };
+        animatingEat = [];
+        
+        player.x = w/2; player.y = h/2;
+        updateEvolution();
+        
+        [skillSpeed, skillShield, skillSlow, skillDouble].forEach(btn => {
+            btn.classList.add('disabled');
+            btn.classList.remove('active');
+        });
+        
+        targetX = player.x; targetY = player.y;
+        pointerActive = false; pointerInside = false;
+        
         initAnimals();
-        refreshScoreUI();
-        if (modal) modal.classList.add('hidden');
+        refreshUI();
+        modal?.classList.add('hidden');
     }
 
-    // ===== 开始游戏 =====
     function startGame() {
-        console.log('Game started');
         gameStarted = true;
         gameActive = true;
-        paused = false;
-        if (startOverlay) startOverlay.classList.add('hidden');
-        if (pauseBtn) pauseBtn.disabled = false;
-        if (resetBtn) resetBtn.disabled = false;
-        if (statusText) statusText.textContent = '▶️';
-        
+        startOverlay?.classList.add('hidden');
+        pauseBtn.disabled = false;
+        resetBtn.disabled = false;
         resetGame();
     }
 
-    // ===== 移动逻辑 =====
+    // ===== 移动 =====
     function moveAI() {
         if (paused || !gameActive) return;
-        
         for (let a of animals) {
-            a.x += a.vx;
-            a.y += a.vy;
-
+            a.x += a.vx; a.y += a.vy;
             if (a.x - a.r < 0) { a.x = a.r; a.vx *= -0.9; }
             else if (a.x + a.r > w) { a.x = w - a.r; a.vx *= -0.9; }
             if (a.y - a.r < 0) { a.y = a.r; a.vy *= -0.9; }
             else if (a.y + a.r > h) { a.y = h - a.r; a.vy *= -0.9; }
-
-            if (Math.random() < 0.01) {
-                let angle = Math.atan2(a.vy, a.vx) + (Math.random() - 0.5) * 0.7;
-                let sp = Math.hypot(a.vx, a.vy);
-                a.vx = Math.cos(angle) * sp;
-                a.vy = Math.sin(angle) * sp;
-            }
         }
     }
 
     function movePlayer() {
         if (!gameActive || paused || !pointerActive || !pointerInside) return;
-
-        let dx = targetX - player.x;
-        let dy = targetY - player.y;
-        let dist = Math.hypot(dx, dy);
-        if (dist < 1.5) return;
-
-        const MOVE_SPEED = 6.5;
-        let moveX = dx, moveY = dy;
-        if (dist > MOVE_SPEED) {
-            moveX = (dx / dist) * MOVE_SPEED;
-            moveY = (dy / dist) * MOVE_SPEED;
-        }
-
-        let newX = player.x + moveX;
-        let newY = player.y + moveY;
-        player.x = Math.max(player.r, Math.min(w - player.r, newX));
-        player.y = Math.max(player.r, Math.min(h - player.r, newY));
+        const dx = targetX - player.x;
+        const dy = targetY - player.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 2) return;
+        
+        const moveX = (dx / dist) * Math.min(dist, player.speed);
+        const moveY = (dy / dist) * Math.min(dist, player.speed);
+        
+        player.x = Math.max(player.r, Math.min(w - player.r, player.x + moveX));
+        player.y = Math.max(player.r, Math.min(h - player.r, player.y + moveY));
     }
 
-    // ===== 碰撞检测 =====
+    // ===== 碰撞 =====
     function handleCollisions() {
         if (!gameActive || paused) return;
 
         for (let i = animals.length - 1; i >= 0; i--) {
             const a = animals[i];
-            const dx = player.x - a.x;
-            const dy = player.y - a.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const threshold = player.r + a.r - 3;
-
-            if (dist < threshold) {
-                if (a.type === 'small' && player.r > a.r + 2) {
-                    score++;
-                    refreshScoreUI();
-                    player.r = Math.min(76, player.r + 1.3);
+            const dist = Math.hypot(player.x - a.x, player.y - a.y);
+            
+            if (dist < player.r + a.r - 3) {
+                if (a.type === 'small' && player.r > a.r + 1) {
+                    // 触发咀嚼动画
+                    isChewing = true;
+                    chewFrame = 5;
+                    
+                    // 被吃动物动画
+                    animatingEat.push({
+                        x: a.x, y: a.y,
+                        scale: 1,
+                        life: 10,
+                        emoji: '🦕'
+                    });
+                    
+                    // 得分
+                    const points = skills.double ? 2 : 1;
+                    score += points;
+                    combo++;
+                    
+                    // 特效
+                    effects.push({
+                        x: a.x, y: a.y - 20,
+                        text: `+${points}`,
+                        life: 20,
+                        color: '#ffd700'
+                    });
+                    
+                    player.r = Math.min(70, player.r + 1);
                     animals.splice(i, 1);
                     animals.push(createAnimal());
+                    
+                    // 进化检查
+                    const newLevel = Math.floor(score / 5) + 1;
+                    if (newLevel > evolution && evolution < EVOLUTIONS.length) {
+                        evolution = newLevel;
+                        skillPoints++;
+                        updateEvolution();
+                        
+                        // 解锁技能
+                        for (let key in skills) {
+                            if (!skills[key]) {
+                                const btn = { speed: skillSpeed, shield: skillShield, slow: skillSlow, double: skillDouble }[key];
+                                btn.classList.remove('disabled');
+                                break;
+                            }
+                        }
+                        
+                        effects.push({
+                            x: player.x, y: player.y - 40,
+                            text: `✨进化 Lv.${evolution}`,
+                            life: 40,
+                            color: '#ffd700'
+                        });
+                    }
                 }
                 else if (a.type === 'rat') {
+                    if (skills.shield) {
+                        skills.shield = false;
+                        skillShield.classList.add('disabled');
+                        effects.push({
+                            x: player.x, y: player.y - 30,
+                            text: '🛡️',
+                            life: 20,
+                            color: '#00ff00'
+                        });
+                        animals.splice(i, 1);
+                        animals.push(createAnimal());
+                        continue;
+                    }
+                    
                     gameActive = false;
-                    if (finalScoreSpan) finalScoreSpan.textContent = score;
-                    if (modal) modal.classList.remove('hidden');
-                    addScoreToRank(score);
+                    finalScore.textContent = score;
+                    finalEvolution.textContent = `${EVOLUTIONS[evolution-1].emoji} Lv.${evolution}`;
+                    modal.classList.remove('hidden');
                     break;
                 }
             }
         }
+        
+        if (combo > 0 && Math.random() < 0.01) combo--;
+        refreshUI();
     }
 
     // ===== 绘制 =====
     function draw() {
-        ctx.fillStyle = '#fafafa';
+        ctx.clearRect(0, 0, w, h);
+        
+        // 背景渐变
+        const gradient = ctx.createLinearGradient(0, 0, 0, h);
+        gradient.addColorStop(0, '#f0f0f0');
+        gradient.addColorStop(1, '#d0d0d0');
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, w, h);
 
-        ctx.strokeStyle = '#e5e5e5';
-        ctx.lineWidth = 0.8;
+        // 网格
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 0.5;
         for (let i = 0; i <= w; i += 40) {
             ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i, h);
-            ctx.strokeStyle = '#e0e0e0';
+            ctx.moveTo(i, 0); ctx.lineTo(i, h);
             ctx.stroke();
         }
         for (let i = 0; i <= h; i += 40) {
             ctx.beginPath();
-            ctx.moveTo(0, i);
-            ctx.lineTo(w, i);
+            ctx.moveTo(0, i); ctx.lineTo(w, i);
             ctx.stroke();
         }
 
-        ctx.font = '42px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Courier New", monospace';
+        // 绘制动物
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-
+        
         for (let a of animals) {
-            if (a.type === 'small') {
-                ctx.fillStyle = '#333333';
-                ctx.fillText('🦕', a.x, a.y);
-            } else {
-                ctx.fillStyle = '#d0312d';
-                ctx.fillText('🐀', a.x, a.y);
-            }
+            ctx.font = `42px "Segoe UI Emoji", "Apple Color Emoji", monospace`;
+            ctx.fillStyle = a.type === 'small' ? '#666' : '#d0312d';
+            ctx.fillText(a.type === 'small' ? '🦕' : '🐀', a.x, a.y);
         }
+        
+        // 被吃动画
+        for (let i = animatingEat.length - 1; i >= 0; i--) {
+            const a = animatingEat[i];
+            a.scale *= 1.2;
+            a.life--;
+            ctx.font = `${42 * a.scale}px "Segoe UI Emoji", "Apple Color Emoji", monospace`;
+            ctx.globalAlpha = a.life / 10;
+            ctx.fillStyle = '#666';
+            ctx.fillText('🦕', a.x, a.y);
+            if (a.life <= 0) animatingEat.splice(i, 1);
+        }
+        ctx.globalAlpha = 1;
 
-        ctx.fillStyle = '#000000';
-        ctx.fillText('🦖', player.x, player.y);
+        // 玩家 - 咀嚼动画
+        let playerEmoji = EVOLUTIONS[evolution-1].emoji;
+        if (isChewing) {
+            chewFrame--;
+            if (chewFrame % 2 === 0) {
+                playerEmoji = playerEmoji.replace('🦖', '🦖👄');
+            }
+            if (chewFrame <= 0) isChewing = false;
+        }
+        ctx.font = `${player.r * 1.2}px "Segoe UI Emoji", "Apple Color Emoji", monospace`;
+        ctx.fillStyle = '#000';
+        ctx.fillText(playerEmoji, player.x, player.y);
+
+        // 特效文字
+        ctx.font = '24px monospace';
+        for (let i = effects.length - 1; i >= 0; i--) {
+            const e = effects[i];
+            ctx.fillStyle = e.color;
+            ctx.globalAlpha = e.life / 20;
+            ctx.fillText(e.text, e.x, e.y - 10 * (1 - e.life/20));
+            e.life--;
+            if (e.life <= 0) effects.splice(i, 1);
+        }
+        ctx.globalAlpha = 1;
 
         if (paused && gameActive) {
-            ctx.font = 'bold 24px "Courier New", monospace';
-            ctx.fillStyle = '#cccccc';
-            ctx.fillText('PAUSED', w/2, 60);
+            ctx.font = 'bold 30px monospace';
+            ctx.fillStyle = '#666';
+            ctx.fillText('⏸', w/2, 60);
         }
     }
 
-    // ===== 游戏循环 =====
+    // ===== 循环 =====
     function gameLoop() {
         if (gameStarted && gameActive && !paused) {
             movePlayer();
@@ -691,123 +771,103 @@
         requestAnimationFrame(gameLoop);
     }
 
-    // ===== 触摸事件 =====
-    function getCanvasCoords(e) {
+    // ===== 触摸 =====
+    function getCoords(e) {
         const rect = canvas.getBoundingClientRect();
-        const scaleX = w / rect.width;
-        const scaleY = h / rect.height;
-
-        let clientX, clientY;
-        if (e.touches) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-
-        if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-            return null;
-        }
-
+        const scale = w / rect.width;
+        const client = e.touches ? e.touches[0] : e;
+        const x = (client.clientX - rect.left) * scale;
+        const y = (client.clientY - rect.top) * scale;
+        if (x < 0 || x > w || y < 0 || y > h) return null;
         return {
-            x: Math.max(player.r, Math.min(w - player.r, (clientX - rect.left) * scaleX)),
-            y: Math.max(player.r, Math.min(h - player.r, (clientY - rect.top) * scaleY))
+            x: Math.max(player.r, Math.min(w - player.r, x)),
+            y: Math.max(player.r, Math.min(h - player.r, y))
         };
     }
 
-    function handlePointerStart(e) {
+    canvas.addEventListener('mousedown', (e) => {
         e.preventDefault();
-        if (!gameStarted || !gameActive) return;
-        
-        const coords = getCanvasCoords(e);
-        if (coords) {
-            targetX = coords.x;
-            targetY = coords.y;
-            pointerActive = true;
-            pointerInside = true;
-        }
-    }
-
-    function handlePointerMove(e) {
-        e.preventDefault();
-        if (!gameStarted || !gameActive || !pointerActive) return;
-        
-        const coords = getCanvasCoords(e);
-        if (coords) {
-            targetX = coords.x;
-            targetY = coords.y;
-            pointerInside = true;
-        } else {
-            pointerInside = false;
-        }
-    }
-
-    function handlePointerEnd(e) {
-        e.preventDefault();
-        pointerActive = false;
-        pointerInside = false;
-    }
-
-    // 注册事件
-    canvas.addEventListener('mousedown', handlePointerStart);
-    canvas.addEventListener('mousemove', handlePointerMove);
-    canvas.addEventListener('mouseup', handlePointerEnd);
-    canvas.addEventListener('mouseleave', () => {
-        pointerActive = false;
-        pointerInside = false;
+        if (!gameActive) return;
+        const coords = getCoords(e);
+        if (coords) { targetX = coords.x; targetY = coords.y; pointerActive = true; pointerInside = true; }
     });
     
-    canvas.addEventListener('touchstart', handlePointerStart);
-    canvas.addEventListener('touchmove', handlePointerMove);
-    canvas.addEventListener('touchend', handlePointerEnd);
-    canvas.addEventListener('touchcancel', handlePointerEnd);
+    canvas.addEventListener('mousemove', (e) => {
+        e.preventDefault();
+        if (!gameActive || !pointerActive) return;
+        const coords = getCoords(e);
+        if (coords) { targetX = coords.x; targetY = coords.y; pointerInside = true; }
+        else pointerInside = false;
+    });
+    
+    canvas.addEventListener('mouseup', () => { pointerActive = false; pointerInside = false; });
+    canvas.addEventListener('mouseleave', () => { pointerActive = false; pointerInside = false; });
+    
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!gameActive) return;
+        const coords = getCoords(e);
+        if (coords) { targetX = coords.x; targetY = coords.y; pointerActive = true; pointerInside = true; }
+    });
+    
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!gameActive || !pointerActive) return;
+        const coords = getCoords(e);
+        if (coords) { targetX = coords.x; targetY = coords.y; pointerInside = true; }
+        else pointerInside = false;
+    });
+    
+    canvas.addEventListener('touchend', () => { pointerActive = false; pointerInside = false; });
+    canvas.addEventListener('touchcancel', () => { pointerActive = false; pointerInside = false; });
 
-    // 按钮事件
-    if (startBtn) {
-        startBtn.addEventListener('click', startGame);
-    }
+    // 按钮
+    startBtn.addEventListener('click', startGame);
+    
+    pauseBtn.addEventListener('click', () => {
+        if (!gameActive) return;
+        paused = !paused;
+        pauseBtn.textContent = paused ? '▶️ 继续' : '⏸️ 暂停';
+    });
+    
+    resetBtn.addEventListener('click', () => {
+        if (!gameStarted) return;
+        resetGame();
+    });
+    
+    retryBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        resetGame();
+    });
 
-    if (pauseBtn) {
-        pauseBtn.addEventListener('click', () => {
-            if (!gameActive) return;
-            paused = !paused;
-            pauseBtn.textContent = paused ? 'RESUME' : 'PAUSE';
-            pauseBtn.classList.toggle('paused', paused);
-            if (statusText) statusText.textContent = paused ? '⏸️' : '▶️';
-        });
-    }
+    shareBtn.addEventListener('click', () => {
+        const text = `我在进化竞技场吃了${score}只小恐龙，进化到${evolution}阶！你敢来挑战吗？🦖`;
+        if (navigator.share) {
+            navigator.share({ title: '进化霸王龙', text });
+        } else {
+            prompt('复制分享文案:', text);
+        }
+    });
 
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            if (!gameStarted) return;
-            resetGame();
-        });
-    }
-
-    if (retryBtn) {
-        retryBtn.addEventListener('click', () => {
-            if (modal) modal.classList.add('hidden');
-            resetGame();
-        });
-    }
+    shareBoardBtn.addEventListener('click', () => {
+        const text = `我目前分数${score}！快来挑战我的记录！🦖`;
+        if (navigator.share) {
+            navigator.share({ title: '好友排名', text });
+        } else {
+            prompt('复制分享文案:', text);
+        }
+    });
 
     window.addEventListener('keydown', (e) => {
-        if (e.key === ' ' || e.code === 'Space') {
+        if (e.key === ' ') {
             e.preventDefault();
             if (!gameStarted || !gameActive) return;
             paused = !paused;
-            if (pauseBtn) {
-                pauseBtn.textContent = paused ? 'RESUME' : 'PAUSE';
-                pauseBtn.classList.toggle('paused', paused);
-            }
-            if (statusText) statusText.textContent = paused ? '⏸️' : '▶️';
+            pauseBtn.textContent = paused ? '▶️ 继续' : '⏸️ 暂停';
         }
     });
 
-    // 启动游戏循环
     gameLoop();
-    console.log('Game initialized');
 })();
 </script>
 </body>
