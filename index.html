@@ -2,856 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- SEO -->
-    <title>T-REX VS RAT · Dino eats small dino but afraid of rat</title>
-    <meta name="description" content="🦖 T-Rex eats small dinos (🦕) for points, but must avoid rats (🐀). Minimalist browser game with local leaderboard.">
-    <meta name="keywords" content="T-REX game, dino game, rat game, browser game, HTML5 game">
-    <meta name="author" content="Your Name">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://dino-rat-game.vercel.app/">
-    <meta property="og:title" content="T-REX VS RAT">
-    <meta property="og:description" content="🦖 eats 🦕, avoids 🐀">
-    <meta property="og:image" content="https://dino-rat-game.vercel.app/screenshot.png">
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="T-REX VS RAT">
-    <meta name="twitter:description" content="🦖 eats 🦕, avoids 🐀">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>🦖</text></svg>">
-    
-    <meta name="theme-color" content="#ffffff">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>T-REX VS RAT</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
         }
-
-        html, body {
-            width: 100%;
-            min-height: 100vh;
-            background-color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        body {
+            background: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 8px;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 10px;
         }
-
         .game-card {
             width: 100%;
             max-width: 500px;
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            padding: 16px 12px;
+            border: 1px solid #000;
+            padding: 20px;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #000000;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
         }
-
         .title {
-            font-size: clamp(18px, 5vw, 24px);
-            font-weight: 600;
-            color: #000000;
+            font-size: 24px;
+            font-weight: bold;
         }
-
         .score {
-            font-size: clamp(24px, 7vw, 32px);
-            font-weight: 700;
-            color: #000000;
+            font-size: 32px;
+            font-weight: bold;
         }
-
         .canvas-container {
             position: relative;
             width: 100%;
-            aspect-ratio: 1 / 1;
-            margin-bottom: 16px;
-            border: 1px solid #d0d0d0;
-            background-color: #fafafa;
+            aspect-ratio: 1;
+            border: 1px solid #ccc;
+            background: #f5f5f5;
+            margin-bottom: 20px;
         }
-
         canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            background-color: #fafafa;
-            cursor: crosshair;
+            display: block;
             touch-action: none;
         }
-
-        /* 开始覆盖层 */
         .start-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.98);
+            background: rgba(255,255,255,0.95);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 30;
-            border: 1px solid #000;
+            z-index: 10;
         }
-
-        .start-emoji {
-            font-size: clamp(40px, 15vw, 80px);
-            margin-bottom: 16px;
-        }
-
-        .start-title {
-            font-size: clamp(20px, 6vw, 28px);
-            font-weight: 700;
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
         .start-btn {
-            background: none;
-            border: 2px solid #000;
-            font-size: clamp(18px, 5vw, 24px);
-            font-weight: 600;
-            padding: 12px 32px;
-            color: #000;
-            cursor: pointer;
-            background-color: #ffffff;
-            min-width: 160px;
-        }
-
-        .start-btn:active {
-            background-color: #000;
-            color: #fff;
-        }
-
-        .start-hint {
+            background: white;
+            border: 2px solid black;
+            font-size: 24px;
+            padding: 15px 40px;
             margin-top: 20px;
-            color: #666;
-            font-size: clamp(12px, 3.5vw, 14px);
-            text-align: center;
-        }
-
-        /* 游戏结束弹窗 */
-        .gameover-modal {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #ffffff;
-            border: 2px solid #000000;
-            padding: 24px 16px;
-            text-align: center;
-            z-index: 20;
-            width: 80%;
-            max-width: 280px;
-        }
-
-        .modal-title {
-            font-size: clamp(24px, 6vw, 32px);
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 12px;
-        }
-
-        .modal-score {
-            font-size: clamp(40px, 10vw, 56px);
-            font-weight: 700;
-            color: #000;
-            margin: 12px 0;
-            border-top: 1px solid #000;
-            border-bottom: 1px solid #000;
-            padding: 12px 0;
-        }
-
-        .modal-btn {
-            background: none;
-            border: 2px solid #000;
-            font-size: clamp(18px, 5vw, 24px);
-            font-weight: 600;
-            padding: 12px 24px;
-            color: #000;
             cursor: pointer;
-            margin-top: 12px;
-            width: 100%;
         }
-
-        .modal-btn:active {
-            background-color: #000;
-            color: #fff;
-        }
-
-        /* 控制栏 */
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            gap: 8px;
-        }
-
-        .pause-btn, .reset-btn {
-            background: none;
-            border: 1px solid #222;
-            font-size: clamp(14px, 4vw, 16px);
-            font-weight: 500;
-            padding: 8px 16px;
-            color: #000;
-            cursor: pointer;
-            background-color: #ffffff;
-            min-width: 70px;
-        }
-
-        .pause-btn:active, .reset-btn:active {
-            background-color: #f0f0f0;
-        }
-
-        .pause-btn.paused {
-            background-color: #000;
-            color: #fff;
-        }
-
-        .status {
-            font-size: clamp(14px, 4vw, 16px);
-            color: #666;
-            min-width: 70px;
-            text-align: center;
-        }
-
-        .reset-btn {
-            border: 1px solid #aaa;
-        }
-
-        /* 排行榜 */
-        .leaderboard {
-            margin-top: 16px;
-            border: 1px solid #000;
-            padding: 12px;
-        }
-
-        .leaderboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
-        }
-
-        .leaderboard-title {
-            font-size: clamp(16px, 4.5vw, 18px);
-            font-weight: 600;
-        }
-
-        .clear-btn {
-            background: none;
-            border: 1px solid #999;
-            padding: 4px 8px;
-            font-size: clamp(11px, 3vw, 12px);
-            cursor: pointer;
-            color: #666;
-        }
-
-        .leaderboard-list {
-            min-height: 80px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: clamp(12px, 3.5vw, 14px);
-        }
-
-        .rank-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 4px;
-            border-bottom: 1px dotted #eee;
-        }
-
-        .rank-number {
-            font-weight: 600;
-            width: 35px;
-        }
-
-        .rank-score {
-            font-weight: 600;
-            width: 50px;
-            text-align: right;
-        }
-
-        .rank-date {
-            color: #999;
-            font-size: clamp(10px, 3vw, 12px);
-            flex: 1;
-            text-align: right;
-        }
-
-        .empty-message {
-            color: #aaa;
-            text-align: center;
-            padding: 16px 0;
-        }
-
-        .footer {
-            margin-top: 16px;
-            text-align: center;
-            color: #aaa;
-            font-size: clamp(16px, 5vw, 20px);
-            border-top: 1px solid #eee;
-            padding-top: 12px;
-        }
-
         .hidden {
             display: none !important;
         }
-
-        /* 确保手机点击区域足够大 */
-        button {
-            min-height: 44px;
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
-<div class="game-card">
-    <!-- 头部 -->
-    <div class="header">
-        <div class="title">🦖 VS 🐀</div>
-        <div class="score" id="scoreDisplay">0</div>
-    </div>
-
-    <!-- 游戏画布区域 -->
-    <div class="canvas-container" id="canvasContainer">
-        <canvas id="gameCanvas" width="500" height="500"></canvas>
-        
-        <!-- 开始覆盖层 -->
-        <div id="startOverlay" class="start-overlay">
-            <div class="start-emoji">🦖 🐀</div>
-            <div class="start-title">T-REX VS RAT</div>
-            <button class="start-btn" id="startBtn">START</button>
-            <div class="start-hint">👆 touch to move · ␣ pause</div>
+    <div class="game-card">
+        <div class="header">
+            <div class="title">🦖 VS 🐀</div>
+            <div class="score" id="scoreDisplay">0</div>
         </div>
-        
-        <!-- 游戏结束弹窗 -->
-        <div id="gameoverModal" class="gameover-modal hidden">
-            <div class="modal-title">GAME OVER</div>
-            <div class="modal-score" id="finalScoreDisplay">0</div>
-            <button class="modal-btn" id="retryBtn">AGAIN</button>
-        </div>
-    </div>
 
-    <!-- 控制栏 -->
-    <div class="controls">
-        <button class="pause-btn" id="pauseBtn" disabled>PAUSE</button>
-        <span class="status" id="statusText">⏹️</span>
-        <button class="reset-btn" id="resetBtn" disabled>↺</button>
-    </div>
-
-    <!-- 排行榜 -->
-    <div class="leaderboard">
-        <div class="leaderboard-header">
-            <div class="leaderboard-title">🏆 LEADERBOARD</div>
-            <button class="clear-btn" id="clearRankBtn">CLEAR</button>
-        </div>
-        <div class="leaderboard-list" id="rankList">
-            <div class="empty-message">no records yet</div>
-        </div>
-    </div>
-
-    <!-- 页脚 -->
-    <div class="footer">
-        <span>🦖 🦕 🐀</span>
-    </div>
-</div>
-
-<script>
-(function() {
-    'use strict';
-
-    // 确保所有DOM元素都加载完成
-    window.addEventListener('load', function() {
-        console.log('Page loaded, initializing game...');
-        initGame();
-    });
-
-    function initGame() {
-        // ===== 获取DOM元素 =====
-        const canvas = document.getElementById('gameCanvas');
-        if (!canvas) {
-            console.error('Canvas not found!');
-            return;
-        }
-
-        const ctx = canvas.getContext('2d');
-        
-        // 设置canvas实际尺寸
-        const w = 500, h = 500;
-        canvas.width = w;
-        canvas.height = h;
-
-        console.log('Canvas initialized:', canvas.width, canvas.height);
-
-        // ===== 游戏状态 =====
-        let gameStarted = false;
-        let gameActive = false;
-        let paused = false;
-        let score = 0;
-
-        // 玩家
-        let player = {
-            x: w / 2,
-            y: h / 2,
-            r: 38
-        };
-
-        let targetX = player.x;
-        let targetY = player.y;
-        let pointerInside = false;
-        let pointerActive = false;
-
-        let animals = [];
-        const ANIMAL_COUNT = 14;
-
-        // ===== DOM 元素 =====
-        const scoreSpan = document.getElementById('scoreDisplay');
-        const statusText = document.getElementById('statusText');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const startOverlay = document.getElementById('startOverlay');
-        const startBtn = document.getElementById('startBtn');
-        const modal = document.getElementById('gameoverModal');
-        const finalScoreSpan = document.getElementById('finalScoreDisplay');
-        const retryBtn = document.getElementById('retryBtn');
-        const rankList = document.getElementById('rankList');
-        const clearRankBtn = document.getElementById('clearRankBtn');
-
-        // ===== 排行榜 =====
-        function loadRanks() {
-            try {
-                const stored = localStorage.getItem('dinoRatRanks');
-                return stored ? JSON.parse(stored) : [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function saveRanks(ranks) {
-            try {
-                localStorage.setItem('dinoRatRanks', JSON.stringify(ranks));
-            } catch (e) {}
-        }
-
-        function displayRanks() {
-            if (!rankList) return;
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="500" height="500"></canvas>
             
-            const ranks = loadRanks();
-            if (ranks.length === 0) {
-                rankList.innerHTML = '<div class="empty-message">no records yet</div>';
+            <div id="startOverlay" class="start-overlay">
+                <div style="font-size: 60px; margin-bottom: 20px;">🦖 🐀</div>
+                <div style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">T-REX VS RAT</div>
+                <button class="start-btn" id="startBtn">START</button>
+                <div style="margin-top: 20px; color: #666;">touch to move</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>🦖 🦕 🐀</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            console.log('Script started');
+            
+            const canvas = document.getElementById('gameCanvas');
+            console.log('Canvas:', canvas);
+            
+            if (!canvas) {
+                console.error('Canvas not found!');
                 return;
             }
-
-            let html = '';
-            ranks.forEach((item, index) => {
-                let medal = '';
-                if (index === 0) medal = '🥇';
-                else if (index === 1) medal = '🥈';
-                else if (index === 2) medal = '🥉';
-                
-                html += `
-                    <div class="rank-item">
-                        <span class="rank-number">${medal || (index + 1)}</span>
-                        <span class="rank-score">${item.score}</span>
-                        <span class="rank-date">${item.date || ''}</span>
-                    </div>
-                `;
-            });
-            rankList.innerHTML = html;
-        }
-
-        function addScoreToRank(newScore) {
-            if (newScore === 0) return;
             
-            const ranks = loadRanks();
-            const now = new Date();
-            const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const ctx = canvas.getContext('2d');
+            const w = 500, h = 500;
             
-            ranks.push({ score: newScore, date: dateStr });
-            ranks.sort((a, b) => b.score - a.score);
-            saveRanks(ranks.slice(0, 10));
-            displayRanks();
-        }
-
-        function clearRanks() {
-            if (confirm('Clear all records?')) {
-                localStorage.removeItem('dinoRatRanks');
-                displayRanks();
-            }
-        }
-
-        // 初始化排行榜
-        displayRanks();
-        if (clearRankBtn) {
-            clearRankBtn.addEventListener('click', clearRanks);
-        }
-
-        // ===== UI更新 =====
-        function refreshScoreUI() {
-            if (scoreSpan) {
-                scoreSpan.textContent = score;
-            }
-        }
-
-        // ===== 生成动物 =====
-        function createAnimal(avoidPlayer = true) {
-            let type, r;
-            if (Math.random() < 0.65) {
-                type = 'small';
-                r = 22 + Math.floor(Math.random() * 14);
-            } else {
-                type = 'rat';
-                r = 24 + Math.floor(Math.random() * 14);
-            }
-
-            let x, y;
-            let attempts = 0;
-            const maxAttempts = 800;
-
-            do {
-                x = r + Math.random() * (w - 2 * r);
-                y = r + Math.random() * (h - 2 * r);
-                attempts++;
-                
-                if (attempts > maxAttempts) break;
-                
-            } while (false); // 简化生成逻辑
-
-            let speed = (type === 'small') ? 1.0 + Math.random() * 1.4 : 1.5 + Math.random() * 1.6;
-            let angle = Math.random() * 2 * Math.PI;
-            
-            animals.push({
-                x, y, r,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                type: type
-            });
-        }
-
-        // ===== 重置游戏 =====
-        function resetGame() {
-            gameActive = true;
-            paused = false;
-            if (pauseBtn) {
-                pauseBtn.textContent = 'PAUSE';
-                pauseBtn.classList.remove('paused');
-            }
-            if (statusText) statusText.textContent = '▶️';
-            score = 0;
-            player.x = w / 2;
-            player.y = h / 2;
-            player.r = 38;
-
-            targetX = player.x;
-            targetY = player.y;
-            pointerInside = false;
-            pointerActive = false;
-
-            animals = [];
-            for (let i = 0; i < ANIMAL_COUNT; i++) {
-                createAnimal(true);
-            }
-            refreshScoreUI();
-            if (modal) modal.classList.add('hidden');
-        }
-
-        // ===== 开始游戏 =====
-        function startGame() {
-            console.log('Game started');
-            gameStarted = true;
-            gameActive = true;
-            paused = false;
-            if (startOverlay) startOverlay.classList.add('hidden');
-            if (pauseBtn) pauseBtn.disabled = false;
-            if (resetBtn) resetBtn.disabled = false;
-            if (statusText) statusText.textContent = '▶️';
-            
-            resetGame();
-        }
-
-        // ===== 移动逻辑 =====
-        function moveAI() {
-            if (paused || !gameActive) return;
-            
-            for (let a of animals) {
-                a.x += a.vx;
-                a.y += a.vy;
-
-                if (a.x - a.r < 0) { a.x = a.r; a.vx *= -0.9; }
-                else if (a.x + a.r > w) { a.x = w - a.r; a.vx *= -0.9; }
-                if (a.y - a.r < 0) { a.y = a.r; a.vy *= -0.9; }
-                else if (a.y + a.r > h) { a.y = h - a.r; a.vy *= -0.9; }
-            }
-        }
-
-        function movePlayer() {
-            if (!gameActive || paused || !pointerActive || !pointerInside) return;
-
-            let dx = targetX - player.x;
-            let dy = targetY - player.y;
-            let dist = Math.hypot(dx, dy);
-            if (dist < 1.5) return;
-
-            const MOVE_SPEED = 6.5;
-            let moveX = dx, moveY = dy;
-            if (dist > MOVE_SPEED) {
-                moveX = (dx / dist) * MOVE_SPEED;
-                moveY = (dy / dist) * MOVE_SPEED;
-            }
-
-            let newX = player.x + moveX;
-            let newY = player.y + moveY;
-            player.x = Math.max(player.r, Math.min(w - player.r, newX));
-            player.y = Math.max(player.r, Math.min(h - player.r, newY));
-        }
-
-        // ===== 碰撞检测 =====
-        function handleCollisions() {
-            if (!gameActive || paused) return;
-
-            for (let i = animals.length - 1; i >= 0; i--) {
-                const a = animals[i];
-                const dx = player.x - a.x;
-                const dy = player.y - a.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                const threshold = player.r + a.r - 3;
-
-                if (dist < threshold) {
-                    if (a.type === 'small' && player.r > a.r + 2) {
-                        score++;
-                        refreshScoreUI();
-                        player.r = Math.min(76, player.r + 1.3);
-                        animals.splice(i, 1);
-                        createAnimal(true);
-                    }
-                    else if (a.type === 'rat') {
-                        gameActive = false;
-                        if (finalScoreSpan) finalScoreSpan.textContent = score;
-                        if (modal) modal.classList.remove('hidden');
-                        addScoreToRank(score);
-                        break;
-                    }
-                }
-            }
-        }
-
-        // ===== 绘制 =====
-        function draw() {
-            if (!ctx) return;
-
-            // 清空画布
-            ctx.fillStyle = '#fafafa';
+            // 简单的绘制测试
+            ctx.fillStyle = '#f0f0f0';
             ctx.fillRect(0, 0, w, h);
-
-            // 网格线
-            ctx.strokeStyle = '#e5e5e5';
-            ctx.lineWidth = 0.8;
-            for (let i = 0; i <= w; i += 40) {
-                ctx.beginPath();
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, h);
-                ctx.strokeStyle = '#e0e0e0';
-                ctx.stroke();
-            }
-            for (let i = 0; i <= h; i += 40) {
-                ctx.beginPath();
-                ctx.moveTo(0, i);
-                ctx.lineTo(w, i);
-                ctx.stroke();
-            }
-
-            // 设置字体
-            ctx.font = '42px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Courier New", monospace';
+            ctx.font = '50px Arial';
+            ctx.fillStyle = '#000';
             ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            // 绘制动物
-            for (let a of animals) {
-                if (a.type === 'small') {
-                    ctx.fillStyle = '#333333';
-                    ctx.fillText('🦕', a.x, a.y);
-                } else {
-                    ctx.fillStyle = '#d0312d';
-                    ctx.fillText('🐀', a.x, a.y);
-                }
-            }
-
-            // 绘制玩家
-            ctx.fillStyle = '#000000';
-            ctx.fillText('🦖', player.x, player.y);
-
-            // 暂停提示
-            if (paused && gameActive) {
-                ctx.font = 'bold 24px "Courier New", monospace';
-                ctx.fillStyle = '#cccccc';
-                ctx.fillText('PAUSED', w/2, 60);
-            }
-        }
-
-        // ===== 游戏循环 =====
-        function gameLoop() {
-            if (gameStarted && gameActive && !paused) {
-                movePlayer();
-                moveAI();
-                handleCollisions();
-            }
-
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
-
-        // ===== 触摸/鼠标事件 =====
-        function getCanvasCoordinates(e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = w / rect.width;
-            const scaleY = h / rect.height;
-
-            let clientX, clientY;
-            if (e.touches) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-
-            // 检查是否在canvas范围内
-            if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-                return null;
-            }
-
-            let rawX = (clientX - rect.left) * scaleX;
-            let rawY = (clientY - rect.top) * scaleY;
+            ctx.fillText('🦖', w/2, h/2);
             
-            return {
-                x: Math.max(player.r, Math.min(w - player.r, rawX)),
-                y: Math.max(player.r, Math.min(h - player.r, rawY))
-            };
-        }
-
-        function handlePointerStart(e) {
-            e.preventDefault();
-            if (!gameStarted || !gameActive) return;
+            console.log('Drawing test completed');
             
-            const coords = getCanvasCoordinates(e);
-            if (coords) {
-                targetX = coords.x;
-                targetY = coords.y;
-                pointerInside = true;
-                pointerActive = true;
-            }
-        }
-
-        function handlePointerMove(e) {
-            e.preventDefault();
-            if (!gameStarted || !gameActive || !pointerActive) return;
+            // 开始按钮
+            const startBtn = document.getElementById('startBtn');
+            const startOverlay = document.getElementById('startOverlay');
             
-            const coords = getCanvasCoordinates(e);
-            if (coords) {
-                targetX = coords.x;
-                targetY = coords.y;
-                pointerInside = true;
-            } else {
-                pointerInside = false;
+            if (startBtn) {
+                startBtn.addEventListener('click', function() {
+                    console.log('Start button clicked');
+                    startOverlay.classList.add('hidden');
+                    
+                    // 重新绘制
+                    ctx.clearRect(0, 0, w, h);
+                    ctx.fillStyle = '#f0f0f0';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.font = '50px Arial';
+                    ctx.fillStyle = '#000';
+                    ctx.fillText('🦖', w/2, h/2);
+                    ctx.fillText('🦕', w/3, h/1.5);
+                    ctx.fillStyle = 'red';
+                    ctx.fillText('🐀', w*2/3, h/1.5);
+                });
             }
-        }
-
-        function handlePointerEnd(e) {
-            e.preventDefault();
-            pointerActive = false;
-            pointerInside = false;
-        }
-
-        // 注册事件
-        canvas.addEventListener('mousedown', handlePointerStart);
-        canvas.addEventListener('mousemove', handlePointerMove);
-        canvas.addEventListener('mouseup', handlePointerEnd);
-        canvas.addEventListener('mouseleave', () => {
-            pointerActive = false;
-            pointerInside = false;
-        });
-        
-        canvas.addEventListener('touchstart', handlePointerStart);
-        canvas.addEventListener('touchmove', handlePointerMove);
-        canvas.addEventListener('touchend', handlePointerEnd);
-        canvas.addEventListener('touchcancel', handlePointerEnd);
-
-        // 按钮事件
-        if (startBtn) {
-            startBtn.addEventListener('click', startGame);
-        }
-
-        if (pauseBtn) {
-            pauseBtn.addEventListener('click', () => {
-                if (!gameActive) return;
-                paused = !paused;
-                pauseBtn.textContent = paused ? 'RESUME' : 'PAUSE';
-                pauseBtn.classList.toggle('paused', paused);
-                if (statusText) statusText.textContent = paused ? '⏸️' : '▶️';
-            });
-        }
-
-        if (resetBtn) {
-            resetBtn.addEventListener('click', () => {
-                if (!gameStarted) return;
-                resetGame();
-            });
-        }
-
-        if (retryBtn) {
-            retryBtn.addEventListener('click', () => {
-                if (modal) modal.classList.add('hidden');
-                resetGame();
-            });
-        }
-
-        // 空格键暂停
-        window.addEventListener('keydown', (e) => {
-            if (e.key === ' ' || e.code === 'Space') {
-                e.preventDefault();
-                if (!gameStarted || !gameActive) return;
-                paused = !paused;
-                if (pauseBtn) {
-                    pauseBtn.textContent = paused ? 'RESUME' : 'PAUSE';
-                    pauseBtn.classList.toggle('paused', paused);
-                }
-                if (statusText) statusText.textContent = paused ? '⏸️' : '▶️';
-            }
-        });
-
-        // 启动游戏循环
-        gameLoop();
-        console.log('Game loop started');
-    }
-})();
-</script>
+            
+            console.log('Event listeners added');
+        })();
+    </script>
 </body>
 </html>
